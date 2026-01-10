@@ -3,6 +3,10 @@
   "name": "YouTube Playlist Time",
   "version": "1.0",
   "description": "Shows total watch time of a YouTube playlist",
+  "permissions": ["tabs"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],

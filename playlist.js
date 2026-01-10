@@ -18,7 +18,7 @@ function formatTime(totalSeconds) {
     else return `${s}s`;
 }
 
-function calculatePlaylistTime() {
+function calculateWatchTime() {
     const timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
 
     let totalSeconds = 0;
@@ -33,6 +33,8 @@ function calculatePlaylistTime() {
 }
 
 function showWatchTimeLabel() {
+    exists = document.getElementById("playlist-total-time");
+    if (exists) return;
     const header = document.getElementById("header-description");
     const watchTimeContainer = document.createElement("div");
     watchTimeContainer.className = "style-scope ytd-playlist-panel-renderer";
@@ -48,12 +50,12 @@ function showWatchTimeLabel() {
 function refreshWatchTime() {
     textWrapper = document.getElementById("playlist-total-time");
     if (!textWrapper) return;
-    const totalSeconds = calculatePlaylistTime();
+    const totalSeconds = calculateWatchTime();
     textWrapper.innerText = `Watch Time: ${formatTime(totalSeconds)}`;
 }
 
 function playlistLoaded() {
-    const playlist = document.querySelector("#playlist");
+    const playlist = document.getElementById("publisher-container");
     if (!playlist) return false;
     else return true;
 }
@@ -67,12 +69,6 @@ function allVideosLoaded() {
     const timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
     if (timeElements.length === videosNum) return true;
     else return false;
-}
-
-function playlistLoaded() {
-    const playlist = document.querySelector("#playlist");
-    if (!playlist) return false;
-    else return true;
 }
 
 function trackWatchTime() {
@@ -92,4 +88,8 @@ function displayWatchTime() {
     trackWatchTime();
 }
 
-displayWatchTime();
+chrome.runtime.onMessage.addListener((message, sender, response) => {
+    if (message.type === "list") {
+        displayWatchTime();
+    }
+});
