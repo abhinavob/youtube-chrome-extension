@@ -18,8 +18,14 @@ function formatTime(totalSeconds) {
     else return `${s}s`;
 }
 
-function calculateWatchTime() {
-    const timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
+function calculateWatchTime(type) {
+    let timeElements;
+    if (type === "playlistVideo") {
+        timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
+    }
+    else if (type === "playlist") {
+        timeElements = document.querySelectorAll("#overlays .yt-badge-shape__text");
+    }
 
     let totalSeconds = 0;
 
@@ -32,64 +38,99 @@ function calculateWatchTime() {
     return totalSeconds;
 }
 
-function showWatchTimeLabel() {
+function showWatchTimeLabel(type) {
     exists = document.getElementById("playlist-total-time");
     if (exists) return;
-    const header = document.getElementById("header-description");
-    const watchTimeContainer = document.createElement("div");
-    watchTimeContainer.className = "style-scope ytd-playlist-panel-renderer";
-    watchTimeContainer.style.marginTop = "2px";
-    const textWrapper = document.createElement("div");
-    textWrapper.className = "index-message-wrapper style-scope ytd-playlist-panel-renderer";
-    textWrapper.innerText = "Watch Time:";
-    textWrapper.id = "playlist-total-time";
-    watchTimeContainer.appendChild(textWrapper);
-    header.appendChild(watchTimeContainer);
+    if (type === "playlistVideo") {
+        const header = document.getElementById("header-description");
+        const watchTimeContainer = document.createElement("div");
+        watchTimeContainer.className = "style-scope ytd-playlist-panel-renderer";
+        watchTimeContainer.style.marginTop = "2px";
+        const textWrapper = document.createElement("div");
+        textWrapper.className = "index-message-wrapper style-scope ytd-playlist-panel-renderer";
+        textWrapper.innerText = "Watch Time:";
+        textWrapper.id = "playlist-total-time";
+        watchTimeContainer.appendChild(textWrapper);
+        header.appendChild(watchTimeContainer);
+    }
+    else if (type === "playlist") {
+        const parent = document.querySelector(".yt-page-header-view-model__scroll-container .yt-page-header-view-model__page-header-content-metadata");
+        const watchTimeTextWrapper = document.createElement("div");
+        watchTimeTextWrapper.className = "yt-core-attributed-string yt-content-metadata-view-model__metadata-text yt-core-attributed-string--white-space-pre-wrap yt-core-attributed-string--link-inherit-color";
+        watchTimeTextWrapper.style.marginTop = "2px";
+        watchTimeTextWrapper.innerText = "Watch Time:";
+        watchTimeTextWrapper.id = "playlist-total-time";
+        parent.appendChild(watchTimeTextWrapper);
+    }
 }
 
-function refreshWatchTime() {
+function refreshWatchTime(type) {
     textWrapper = document.getElementById("playlist-total-time");
     if (!textWrapper) return;
-    const totalSeconds = calculateWatchTime();
+    const totalSeconds = calculateWatchTime(type);
     textWrapper.innerText = `Watch Time: ${formatTime(totalSeconds)}`;
 }
 
-function playlistLoaded() {
-    const playlist = document.getElementById("publisher-container");
-    if (!playlist) return false;
-    else return true;
+// playlist here refers to the container of the playlist title and the publisher
+function playlistLoaded(type) {
+    if (type === "playlistVideo") {
+        const playlist = document.getElementById("publisher-container");
+        if (!playlist) return false;
+        else return true;
+    }
+    else if (type === "playlist") {
+        const scrollContainer = document.querySelector(".yt-page-header-view-model__scroll-container");
+        if (!scrollContainer) return false;
+        else return true;
+    }
 }
 
-function allVideosLoaded() {
-    if (!playlistLoaded()) return false;
+// allVideos here refers to all the videos and their durations that appear in the playlist
+function allVideosLoaded(type) {
+    if (!playlistLoaded(type)) return false;
 
-    const spans = document.querySelectorAll("#playlist #publisher-container div .yt-formatted-string");
-    const lastSpan = spans[spans.length - 1];
-    const videosNum = parseInt(lastSpan.innerText, 10);
-    const timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
-    if (timeElements.length === videosNum) return true;
-    else return false;
+    if (type === "playlistVideo") {
+        const spans = document.querySelectorAll("#playlist #publisher-container div .yt-formatted-string");
+        const lastSpan = spans[spans.length - 1];
+        const videosNum = parseInt(lastSpan.innerText, 10);
+        const timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
+        if (timeElements.length === videosNum) return true;
+        else return false;
+    }
+    else if (type === "playlist") {
+        const spans = document.querySelectorAll(".yt-page-header-view-model__scroll-container .yt-page-header-view-model__page-header-content-metadata .yt-core-attributed-string");
+        const videosText = spans[2].innerText;
+        const videosNum = parseInt(videosText, 10);
+        const timeElements = document.querySelectorAll("#overlays .yt-badge-shape__text");
+        if (timeElements.length === videosNum) return true;
+        else return false;
+    }
 }
 
-function trackWatchTime() {
+function trackWatchTime(type) {
     // Repeatedly refresh watch time until all videos are loaded
-    if (!allVideosLoaded()) setTimeout(trackWatchTime, 200);
-    refreshWatchTime();
+    if (!allVideosLoaded(type)) setTimeout(() => trackWatchTime(type), 200);
+    refreshWatchTime(type);
 }
 
-function displayWatchTime() {
-    if (!playlistLoaded()) {
-        setTimeout(displayWatchTime, 200);
+function displayWatchTime(type) {
+    if (!playlistLoaded(type)) {
+        setTimeout(() => displayWatchTime(type), 200);
         return;
     }
 
-    showWatchTimeLabel();
+    showWatchTimeLabel(type);
 
-    trackWatchTime();
+    trackWatchTime(type);
 }
 
 chrome.runtime.onMessage.addListener((message, sender, response) => {
-    if (message.type === "list") {
-        displayWatchTime();
+    // playlistVideo refers to the YouTube page where a video of the playlist is being watched with the playlist on the side
+    if (message.type === "playlistVideo") {
+        displayWatchTime("playlistVideo");
+    }
+    // playlist refers to the YouTube page of the playlist itself
+    else if (message.type === "playlist") {
+        displayWatchTime("playlist");
     }
 });
