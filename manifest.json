@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "YouTube Playlist Time",
+  "name": "YT Watch Assist",
   "version": "1.0",
-  "description": "Shows total watch time of a YouTube playlist",
+  "description": "Shows total watch time of playlists and allows extended playback speed control on YouTube videos.",
   "permissions": ["tabs"],
   "background": {
     "service_worker": "background.js"
@@ -10,7 +10,21 @@
   "content_scripts": [
     {
       "matches": ["https://www.youtube.com/*"],
-      "js": ["playlist.js"]
+      "js": ["playlist.js", "playback.js"]
     }
-  ]
+  ],
+  "commands": {
+    "speed-up": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Period"
+      },
+      "description": "Increase playback speed"
+    },
+    "speed-down": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Comma"
+      },
+      "description": "Decrease playback speed"
+    }
+  }
 }

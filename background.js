@@ -10,3 +10,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         }
     }
 });
+
+chrome.commands.onCommand.addListener((command) => {
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+        if (!tab?.id) return;
+        chrome.tabs.sendMessage(tab.id, { command });
+    });
+});
