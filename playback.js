@@ -26,17 +26,66 @@ function decreaseSpeed(speed) {
     return speed;
 }
 
+function getSpeedBox() {
+    let box = document.getElementById("custom-speed-box");
+    if (box) return box;
+
+    box = document.createElement("div");
+    box.id = "custom-speed-box";
+    box.style.cssText = `
+        position: absolute;
+        top: 17%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.7);
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 20px;
+        font-weight: 500;
+        z-index: 9999;
+        pointer-events: none;
+        display: none;
+    `;
+
+    const player = document.querySelector(".html5-video-player");
+    if (!player) return null;
+
+    player.style.position = "relative";
+    player.appendChild(box);
+
+    return box;
+}
+
+function showSpeedUI(speed) {
+    const player = document.querySelector(".html5-video-player");
+    if (!player) return;
+
+    const box = getSpeedBox();
+    if (!box) return;
+
+    box.textContent = `${speed}x`;
+    box.style.display = "block";
+
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+        box.style.display = "none";
+    }, 800);
+}
+
+let hideTimer;
+
 chrome.runtime.onMessage.addListener((msg) => {
     const video = document.querySelector("video");
     if (!video) return;
     
     if (msg.command === "speed-up") {
         video.playbackRate = increaseSpeed(video.playbackRate);
-        console.log("Speed: " + video.playbackRate + "x");
+        showSpeedUI(video.playbackRate);
     }
-
+    
     if (msg.command === "speed-down") {
         video.playbackRate = decreaseSpeed(video.playbackRate);
-        console.log("Speed: " + video.playbackRate + "x");
+        showSpeedUI(video.playbackRate);
     }
 });
