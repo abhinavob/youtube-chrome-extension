@@ -48,7 +48,7 @@ function getSpeedBox() {
         display: none;
     `;
 
-    const player = document.querySelector(".html5-video-player");
+    const player = document.querySelector("video").parentElement.parentElement;
     if (!player) return null;
 
     player.style.position = "relative";
@@ -58,7 +58,7 @@ function getSpeedBox() {
 }
 
 function showSpeedUI(speed) {
-    const player = document.querySelector(".html5-video-player");
+    const player = document.querySelector("video").parentElement.parentElement;
     if (!player) return;
 
     const box = getSpeedBox();
@@ -73,29 +73,41 @@ function showSpeedUI(speed) {
     }, 800);
 }
 
+function addListeners() {
+    chrome.runtime.onMessage.addListener((msg) => {
+        const video = document.querySelector("video");
+        if (!video) return;
+        
+        if (msg.command === "speed-up") {
+            video.playbackRate = increaseSpeed(video.playbackRate);
+            showSpeedUI(video.playbackRate);
+        }
+        
+        if (msg.command === "speed-down") {
+            video.playbackRate = decreaseSpeed(video.playbackRate);
+            showSpeedUI(video.playbackRate);
+        }
+        
+        if (msg.command === "speed-normal") {
+            video.playbackRate = 1;
+            showSpeedUI(video.playbackRate);
+        }
+        
+        if (msg.command === "speed-max") {
+            video.playbackRate = 16;
+            showSpeedUI(video.playbackRate);
+        }
+    });
+}
+
 let hideTimer;
 
-chrome.runtime.onMessage.addListener((msg) => {
-    const video = document.querySelector("video");
-    if (!video) return;
-    
-    if (msg.command === "speed-up") {
-        video.playbackRate = increaseSpeed(video.playbackRate);
-        showSpeedUI(video.playbackRate);
-    }
-    
-    if (msg.command === "speed-down") {
-        video.playbackRate = decreaseSpeed(video.playbackRate);
-        showSpeedUI(video.playbackRate);
-    }
+chrome.storage.sync.get(
+    { sites: ["youtube.com"] },
+    ({ sites }) => {
+        const host = location.hostname;
+        if (!sites.some(s => host.includes(s))) return;
 
-    if (msg.command === "speed-normal") {
-        video.playbackRate = 1;
-        showSpeedUI(video.playbackRate);
+        addListeners();
     }
-    
-    if (msg.command === "speed-max") {
-        video.playbackRate = 16;
-        showSpeedUI(video.playbackRate);
-    }
-});
+);
