@@ -87,12 +87,12 @@ function addListeners() {
             video.playbackRate = decreaseSpeed(video.playbackRate);
             showSpeedUI(video.playbackRate);
         }
-        
+
         if (msg.command === "speed-normal") {
             video.playbackRate = 1;
             showSpeedUI(video.playbackRate);
         }
-        
+
         if (msg.command === "speed-max") {
             video.playbackRate = 16;
             showSpeedUI(video.playbackRate);

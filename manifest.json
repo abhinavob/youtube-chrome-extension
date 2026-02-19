@@ -20,27 +20,27 @@
   "commands": {
     "speed-up": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Period"
+        "default": "Alt+Shift+Period"
       },
       "description": "Increase playback speed"
     },
     "speed-down": {
       "suggested_key": {
-        "default": "Ctrl+Shift+Comma"
+        "default": "Alt+Shift+Comma"
       },
       "description": "Decrease playback speed"
     },
-    "speed-max": {
-      "suggested_key": {
-        "default": "Alt+Shift+M"
-      },
-      "description": "Set playback speed to maximum"
-    },
     "speed-normal": {
       "suggested_key": {
-        "default": "Alt+Shift+N"
+        "default": "Alt+Shift+K"
       },
       "description": "Set playback speed to normal"
+    },
+    "speed-max": {
+      "suggested_key": {
+        "default": "Alt+Shift+L"
+      },
+      "description": "Set playback speed to maximum"
     }
   },
   "action": {

@@ -13,7 +13,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.commands.onCommand.addListener((command) => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-        if (!tab?.id) return;
-        chrome.tabs.sendMessage(tab.id, { command });
+        if (!tab || !tab.id || !tab.url) return;
+        
+        chrome.storage.sync.get({ sites: ["youtube.com"] }, ({ sites }) => {
+            const url = new URL(tab.url);
+            const host = url.hostname;
+            if (!sites.some(site => host.includes(site))) return;
+
+            chrome.tabs.sendMessage(tab.id, { command });
+        });
     });
 });
