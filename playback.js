@@ -102,12 +102,4 @@ function addListeners() {
 
 let hideTimer;
 
-chrome.storage.sync.get(
-    { sites: ["youtube.com"] },
-    ({ sites }) => {
-        const host = location.hostname;
-        if (!sites.some(s => host.includes(s))) return;
-
-        addListeners();
-    }
-);
+addListeners();
