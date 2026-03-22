@@ -3,7 +3,7 @@
   "name": "YT Watch Assist",
   "version": "1.0",
   "description": "Shows total watch time of playlists and allows extended playback speed control on YouTube videos.",
-  "permissions": ["tabs"],
+  "permissions": ["tabs", "storage"],
   "background": {
     "service_worker": "background.js"
   },
@@ -42,5 +42,8 @@
       },
       "description": "Set playback speed to maximum"
     }
+  },
+  "action": {
+    "default_popup": "popup.html"
   }
 }

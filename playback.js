@@ -127,14 +127,19 @@ function setMaxSpeed() {
 }
 
 let wasAdPlaying = false;
+let autoSpeedAdsEnabled = true;
+
+chrome.storage.sync.get({ autoSpeedAds: true }, ({ autoSpeedAds }) => {
+    autoSpeedAdsEnabled = !!autoSpeedAds;
+});
 
 const observer = new MutationObserver(() => {
     const isAdPlaying = !!document.querySelector(".ad-showing");
 
     if (isAdPlaying && !wasAdPlaying) {
         wasAdPlaying = true;
-        setMaxSpeed();
-        console.log("Ad detected, setting speed to 16x");
+        if (autoSpeedAdsEnabled)
+            setMaxSpeed();
     }
 
     if (!isAdPlaying) {

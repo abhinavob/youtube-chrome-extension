@@ -1,61 +1,30 @@
-#input-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: white;
+  color: black;
 }
 
-#site {
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    padding: 4px 8px;
-    font-size: 14px;
+.popup-root {
+  width: 280px;
+  padding: 14px;
 }
 
-ul#list {
-  list-style: none;
-  padding: 0;
-  font-size: 14px;
+.popup-root h2 {
+  margin: 0 0 12px;
+  font-size: 16px;
 }
 
-#add {
-  background-color: #1a73e8;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 2px 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 18px;
-  transition: background-color 0.2s;
-}
-
-#add:hover {
-    background-color: #155ab6;
-}
-
-ul#list li {
+.toggle-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #f1f3f4;
-  border-radius: 4px;
-  padding: 4px 8px;
-  font-family: Arial, sans-serif;
-}
-
-ul#list li button {
-  background-color: #e53935;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  width: 24px;
-  height: 24px;
+  gap: 12px;
+  font-size: 14px;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 12px;
-  transition: background-color 0.2s;
 }
 
-ul#list li button:hover {
-  background-color: #c62828;
+.toggle-row input {
+  width: 18px;
+  height: 18px;
 }
