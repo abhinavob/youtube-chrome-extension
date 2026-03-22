@@ -120,6 +120,33 @@ function addListeners() {
     });
 }
 
+function setMaxSpeed() {
+    const video = document.querySelector("video");
+    if (!video) return;
+    video.playbackRate = 16;
+}
+
+let wasAdPlaying = false;
+
+const observer = new MutationObserver(() => {
+    const isAdPlaying = !!document.querySelector(".ad-showing");
+
+    if (isAdPlaying && !wasAdPlaying) {
+        wasAdPlaying = true;
+        setMaxSpeed();
+        console.log("Ad detected, setting speed to 16x");
+    }
+
+    if (!isAdPlaying) {
+        wasAdPlaying = false;
+    }
+});
+
+observer.observe(getPlayer() || document.body, {
+    attributes: true,
+    subtree: true
+});
+
 let hideTimer;
 
 addListeners();
