@@ -26,6 +26,19 @@ function decreaseSpeed(speed) {
     return speed;
 }
 
+function getPlayer() {
+    const video = document.querySelector("video");
+    if (!video) return null;
+
+    let player = document.fullscreenElement;
+
+    // Make sure the player is not the document itself (as it is in YouTube) as it causes positioning issues with the speed box
+    if (!player || player === document.documentElement || player === document.body)
+        player = video.parentElement.parentElement;
+
+    return player;
+}
+
 function getSpeedBox() {
     let box = document.getElementById("custom-speed-box");
     if (box) return box;
@@ -34,13 +47,14 @@ function getSpeedBox() {
     box.id = "custom-speed-box";
     box.style.cssText = `
         position: absolute;
-        top: 17%;
+        top: 15%;
         left: 50%;
         transform: translate(-50%, -50%);
         background: rgba(0,0,0,0.7);
         color: #fff;
         padding: 10px 20px;
         border-radius: 6px;
+        font-family: Roboto, Arial, sans-serif;
         font-size: 20px;
         font-weight: 500;
         z-index: 9999;
@@ -48,7 +62,7 @@ function getSpeedBox() {
         display: none;
     `;
 
-    const player = document.querySelector("video").parentElement.parentElement;
+    const player = getPlayer();
     if (!player) return null;
 
     player.style.position = "relative";
@@ -58,11 +72,17 @@ function getSpeedBox() {
 }
 
 function showSpeedUI(speed) {
-    const player = document.querySelector("video").parentElement.parentElement;
+    const player = getPlayer();
     if (!player) return;
 
     const box = getSpeedBox();
     if (!box) return;
+
+    // To account for the player changing when toggling fullscreen, we need to make sure the box is the child of the current player
+    if (box.parentElement !== player) {
+        player.style.position = "relative";
+        player.appendChild(box);
+    }
 
     box.textContent = `${speed}x`;
     box.style.display = "block";
