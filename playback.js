@@ -120,30 +120,29 @@ function addListeners() {
     });
 }
 
-function setMaxSpeed() {
+function speedAd() {
     const video = document.querySelector("video");
     if (!video) return;
+    const isAdPlaying = !!document.querySelector(".ad-showing");
+    if (!isAdPlaying) return;
     video.playbackRate = 16;
 }
 
-let wasAdPlaying = false;
 let autoSpeedAdsEnabled = true;
+let lastRun = 0;
+const delay = 500;
 
 chrome.storage.sync.get({ autoSpeedAds: true }, ({ autoSpeedAds }) => {
     autoSpeedAdsEnabled = !!autoSpeedAds;
 });
 
 const observer = new MutationObserver(() => {
-    const isAdPlaying = !!document.querySelector(".ad-showing");
+    if (!autoSpeedAdsEnabled) return;
 
-    if (isAdPlaying && !wasAdPlaying) {
-        wasAdPlaying = true;
-        if (autoSpeedAdsEnabled)
-            setMaxSpeed();
-    }
-
-    if (!isAdPlaying) {
-        wasAdPlaying = false;
+    const now = Date.now();
+    if (now - lastRun > delay) {
+        setTimeout(speedAd, 500);
+        lastRun = now;
     }
 });
 
