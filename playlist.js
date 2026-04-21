@@ -21,10 +21,10 @@ function formatTime(totalSeconds) {
 function calculateWatchTime(type) {
     let timeElements;
     if (type === "playlistVideo") {
-        timeElements = document.querySelectorAll("#playlist #items .yt-badge-shape__text");
+        timeElements = document.querySelectorAll("#playlist #items .ytBadgeShapeText");
     }
     else if (type === "playlist") {
-        timeElements = document.querySelectorAll("#overlays .yt-badge-shape__text");
+        timeElements = document.querySelectorAll("#overlays .ytBadgeShapeText");
     }
 
     let totalSeconds = 0;
