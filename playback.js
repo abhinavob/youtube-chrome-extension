@@ -120,30 +120,24 @@ function addListeners() {
     });
 }
 
-function speedAd() {
+function skipAd() {
     const video = document.querySelector("video");
     if (!video) return;
     const isAdPlaying = !!document.querySelector(".ad-showing");
     if (!isAdPlaying) return;
-    video.playbackRate = 16;
+    if (video.currentTime > 0)
+        video.currentTime = video.duration;
 }
 
-let autoSpeedAdsEnabled = true;
-let lastRun = 0;
-const delay = 500;
+let autoSkipAdsEnabled = true;
 
-chrome.storage.sync.get({ autoSpeedAds: true }, ({ autoSpeedAds }) => {
-    autoSpeedAdsEnabled = !!autoSpeedAds;
+chrome.storage.sync.get({ autoSkipAds: true }, ({ autoSkipAds }) => {
+    autoSkipAdsEnabled = !!autoSkipAds;
 });
 
 const observer = new MutationObserver(() => {
-    if (!autoSpeedAdsEnabled) return;
-
-    const now = Date.now();
-    if (now - lastRun > delay) {
-        setTimeout(speedAd, 500);
-        lastRun = now;
-    }
+    if (!autoSkipAdsEnabled) return;
+    skipAd();
 });
 
 observer.observe(getPlayer() || document.body, {
