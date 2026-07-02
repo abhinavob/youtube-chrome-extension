@@ -1,15 +1,14 @@
-const autoSpeedAdsToggle = document.getElementById("auto-speed-ads");
+chrome.storage.sync.get({ adMode: "off", adSpeed: 2 }, ({ adMode, adSpeed }) => {
+    document.querySelector(`input[value="${adMode}"]`).checked = true;
+    document.getElementById("adSpeed").value = adSpeed;
+})
 
-function renderPopup(enabled) {
-    autoSpeedAdsToggle.checked = enabled;
-}
+document.querySelectorAll("input[name='adMode']").forEach(radio => {
+    radio.addEventListener("change", () => {
+        chrome.storage.sync.set({ adMode: radio.value });
+    });
+})
 
-chrome.storage.sync.get({ autoSpeedAds: true }, ({ autoSpeedAds }) => {
-    renderPopup(!!autoSpeedAds);
-});
-
-autoSpeedAdsToggle.addEventListener("change", () => {
-    const enabled = autoSpeedAdsToggle.checked;
-    chrome.storage.sync.set({ autoSpeedAds: enabled });
-    renderPopup(enabled);
-});
+document.getElementById("adSpeed").addEventListener("change", (e) => {
+    chrome.storage.sync.set({ adSpeed: parseFloat(e.target.value) });
+})

@@ -120,24 +120,52 @@ function addListeners() {
     });
 }
 
+function clickSkipButton() {
+    const skipBtn = document.querySelector(".ytp-skip-ad-button");
+    if (!skipBtn) return;
+    skipBtn.focus();
+    skipBtn.click();
+}
+
 function skipAd() {
     const video = document.querySelector("video");
     if (!video) return;
     const isAdPlaying = !!document.querySelector(".ad-showing");
     if (!isAdPlaying) return;
-    if (video.currentTime > 0)
+    if (video.currentTime > 0) {
         video.currentTime = video.duration;
+        setTimeout(clickSkipButton, 200);
+    }
 }
 
-let autoSkipAdsEnabled = true;
+let adSpeedApplied = false;
 
-chrome.storage.sync.get({ autoSkipAds: true }, ({ autoSkipAds }) => {
-    autoSkipAdsEnabled = !!autoSkipAds;
+function speedAd() {
+    const video = document.querySelector("video");
+    if (!video) return;
+    const isAdPlaying = !!document.querySelector(".ad-showing");
+    if (!isAdPlaying) {
+        adSpeedApplied = false;
+        return;
+    }
+    if (!adSpeedApplied && video.currentTime > 0) {
+        video.playbackRate = adSpeed;
+        adSpeedApplied = true;
+    }
+}
+
+let adMode = "off";
+let adSpeed = 2;
+
+chrome.storage.sync.get({ adMode: "off", adSpeed: 2 }, (result) => {
+    adMode = result.adMode;
+    adSpeed = result.adSpeed;
 });
 
 const observer = new MutationObserver(() => {
-    if (!autoSkipAdsEnabled) return;
-    skipAd();
+    if (adMode === "off") return;
+    if (adMode === "autoSkip") skipAd();
+    if (adMode === "autoSpeed") speedAd(adSpeed);
 });
 
 observer.observe(getPlayer() || document.body, {
@@ -148,3 +176,19 @@ observer.observe(getPlayer() || document.body, {
 let hideTimer;
 
 addListeners();
+
+document.addEventListener("keydown", (e) => {
+    // Don't fire when user is typing somewhere
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) return;
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+    if (e.code === "Space") {
+        const isAdPlaying = !!document.querySelector(".ad-showing");
+        if (isAdPlaying && adMode === "manualSkip") {
+            skipAd();
+            e.preventDefault(); // stop YouTube from pausing/playing
+            e.stopPropagation();
+        }
+        // if no ad, let spacebar fall through to YouTube normally
+    }
+});
